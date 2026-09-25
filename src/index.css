@@ -1,0 +1,298 @@
+@import 'tailwindcss';
+
+/* -------------------------------------------------------------------------- */
+/*  Palette + type. Change colours here; sections reference these tokens.     */
+/* -------------------------------------------------------------------------- */
+@theme {
+  --color-ink: #03050b; /* the "table" the pieces slide over */
+  --color-night: #050608;
+  --color-navy: #070b1a;
+  --color-navy-2: #0c1433;
+  --color-royal: #1537c9;
+  --color-royal-2: #0f2aa3;
+  --color-electric: #3d7bff;
+  --color-electric-2: #7fb0ff;
+  --color-ice: #eef1f6;
+  --color-ember: #ff6a2b;
+  --color-mint: #3ef0b0;
+
+  --font-display: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@layer base {
+  html {
+    background: var(--color-ink);
+    color: white;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    /* No rubber-band bounce past the ends: it tugs the pinned stage. */
+    overscroll-behavior-y: none;
+  }
+  body {
+    margin: 0;
+    background: var(--color-ink);
+    font-family: var(--font-sans);
+    overflow-x: hidden;
+  }
+  ::selection {
+    background: var(--color-electric);
+    color: white;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-electric-2);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Stage + pieces                                                             */
+/* -------------------------------------------------------------------------- */
+
+.stage {
+  position: relative;
+  /* The table: a mid slate with a dot grid, visible only in the gap between
+     pieces. Lighter than the dark pieces, darker than the light ones, so the
+     gap reads against every section. */
+  background-color: #1a2240;
+  background-image:
+    radial-gradient(rgb(127 176 255 / 0.28) 1px, transparent 1.4px),
+    radial-gradient(120% 60% at 50% 50%, #243058 0%, #1a2240 70%);
+  background-size:
+    22px 22px,
+    100% 100%;
+  overflow-x: clip;
+  /* Native vertical swiping (and pinch-zoom) only; nothing is hijacked. */
+  touch-action: pan-y pinch-zoom;
+}
+
+/* Static flow (reduced motion / no JS): pieces stack; each tab rests in the next notch. */
+.ps {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  outline: none;
+}
+
+/* Animated: a pinned viewport-sized stage, pieces absolutely stacked. */
+.stage.is-animated {
+  height: 100vh;
+  height: 100lvh;
+  overflow: hidden;
+}
+.stage.is-animated .ps {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 100%;
+  min-height: 0;
+  /* Every piece is moved by the timeline, so each keeps its own layer for the
+     whole session. Toggling the hint per section was measured to cost a
+     dropped frame at every section boundary (layer teardown + re-raster). */
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+/* Snap layer: fills the section box; only the magnetic snap moves it. */
+.ps-float {
+  position: absolute;
+  inset: 0;
+}
+
+/* Piece, shadow and seam overhang the section box by the tab room (--pad-*). */
+.ps-piece,
+.ps-shadow,
+.ps-seam-wrap {
+  position: absolute;
+  top: calc(var(--pad-top, 0px) * -1);
+  right: 0;
+  bottom: calc(var(--pad-bottom, 0px) * -1);
+  left: 0;
+}
+.ps-piece {
+  display: flex;
+  box-sizing: border-box;
+  padding: var(--pad-top, 0px) 0 var(--pad-bottom, 0px);
+}
+.ps-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.ps-body {
+  position: relative;
+  flex: 1;
+  display: flex;
+  min-width: 0;
+}
+/* In static mode the section box grows with content, so let the piece do too. */
+.stage:not(.is-animated) .ps-float {
+  position: relative;
+  inset: auto;
+  flex: 1;
+  display: flex;
+}
+.stage:not(.is-animated) .ps-piece {
+  position: relative;
+  inset: auto;
+  flex: 1;
+  margin: calc(var(--pad-top, 0px) * -1) 0 calc(var(--pad-bottom, 0px) * -1);
+}
+
+/* Soft shadow in the piece's own shape, cast while it is lifted off the table.
+   It can only show above the piece's top edge (the piece covers the rest), so
+   the blurred layer is cut to a strip along the top: far less to rasterise the
+   first time it becomes visible. */
+.ps-shadow {
+  bottom: auto;
+  height: calc(var(--pad-top, 0px) + 220px);
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  will-change: opacity;
+  filter: blur(26px);
+  transform: translate3d(0, -14px, 0);
+}
+.ps-shadow-shape {
+  position: absolute;
+  inset: 0;
+  background: rgb(0 0 0 / 0.7);
+}
+@media (max-width: 767px) {
+  .ps-shadow {
+    filter: blur(14px);
+    transform: translate3d(0, -8px, 0);
+  }
+}
+
+/* Seam flash: the light that runs along the joint at the moment of the snap. */
+.ps-seam-wrap {
+  pointer-events: none;
+}
+.ps-seam {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+}
+/* Hidden (not just transparent) between flashes, so it is never painted.
+   usePuzzleScroll toggles it with autoAlpha. */
+.ps-seam [data-seam-flash] {
+  opacity: 0;
+  visibility: hidden;
+}
+.ps-seam path {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+/* No filter: a wide faint stroke reads as glow at a fraction of the raster cost. */
+.ps-seam-glow {
+  stroke-width: 9;
+  stroke-opacity: 0.22;
+}
+.ps-seam-core {
+  stroke-width: 1.5;
+  stroke: white;
+}
+
+/* Rim light: a crisp bevel along each joint edge. Half the stroke is clipped
+   away by the piece outline, so it reads as a cut edge. */
+.ps-rim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.ps-rim path {
+  fill: none;
+  stroke-linejoin: round;
+}
+.ps-rim-line {
+  stroke: rgb(255 255 255 / 0.28);
+  stroke-width: 2;
+}
+.ps[data-theme='light'] .ps-rim-line {
+  stroke: rgb(7 11 26 / 0.18);
+}
+
+/* Line-mask for text reveals. */
+.line-mask {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+.line-mask > span {
+  display: block;
+}
+
+/* Content padding: clear the nav and any notch cut into the top, the mobile
+   browser bar and any notch cut into the bottom. --cut-* come from PuzzleSection. */
+.section-pad {
+  padding-top: max(clamp(6.5rem, 14vh, 9rem), calc(var(--cut-top, 0px) + 4.5rem));
+  padding-bottom: calc(max(2.5rem, calc(100lvh - 100svh + 1.5rem)) + var(--cut-bottom, 0px));
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Small motion details                                                       */
+/* -------------------------------------------------------------------------- */
+
+@keyframes scroll-dot {
+  0% {
+    transform: translateY(-100%);
+  }
+  60%,
+  100% {
+    transform: translateY(260%);
+  }
+}
+.scroll-dot {
+  animation: scroll-dot 2.2s var(--ease-out-expo) infinite;
+}
+
+@keyframes drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(3%, -4%, 0) scale(1.08);
+  }
+}
+.drift {
+  animation: drift 16s ease-in-out infinite;
+}
+.drift-slow {
+  animation: drift 24s ease-in-out infinite reverse;
+}
+
+.grain {
+  /* A pre-rendered PNG tile. It used to be an inline SVG feTurbulence filter,
+     which the browser re-renders for every tile of every full-screen piece:
+     measured as ~40% of all raster time during a transition. */
+  background-image: url('/noise.png');
+  background-size: 160px 160px;
+  /* Plain alpha, no blend mode: a blended full-screen layer over moving
+     parallax has to be recomposited every frame. */
+  opacity: 0.035;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-dot,
+  .drift,
+  .drift-slow {
+    animation: none;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+  }
+}
