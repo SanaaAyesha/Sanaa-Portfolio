@@ -56,7 +56,7 @@ export function Contact(_: SectionProps) {
           ))}
         </ul>
         <div className="flex items-center justify-between gap-6 opacity-80 sm:justify-end">
-          <span>© {new Date().getFullYear()} Interlock Studio</span>
+          <span>© {new Date().getFullYear()} Sanaa Ayesha</span>
         </div>
       </footer>
     </SectionContent>

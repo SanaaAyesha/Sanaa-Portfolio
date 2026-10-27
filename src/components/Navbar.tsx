@@ -69,11 +69,11 @@ export function Navbar({ items, active, theme, total, onNavigate }: NavbarProps)
         <a
           href={`#${items[0].id}`}
           onClick={go(0)}
-          className={`group relative z-10 -ml-3 flex items-center gap-2.5 py-2 pr-4 pl-3 font-sans text-[15px] font-semibold tracking-[0.18em] uppercase ${open ? '' : pill}`}
-          aria-label="Interlock, back to top"
+          className={`group relative z-10 -ml-3 flex items-center gap-2.5 py-2 pr-4 pl-3 font-sans text-[16px] font-semibold tracking-[0.01em] ${open ? '' : pill}`}
+          aria-label="Sanaa Ayesha, back to top"
         >
           <Logo className="h-6 w-6 transition-transform duration-500 ease-out-expo group-hover:-rotate-90" />
-          <span>Interlock</span>
+          <span>Sanaa Ayesha</span>
         </a>
 
         <ul className={`hidden items-center gap-0.5 p-1 lg:flex ${pill}`}>

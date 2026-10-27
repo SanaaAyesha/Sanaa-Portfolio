@@ -1,4 +1,4 @@
-# Interlock: puzzle-piece scroll transitions
+# Sanaa Ayesha: puzzle-piece scroll transitions
 
 A React + Vite + TypeScript + GSAP ScrollTrigger + Tailwind v4 site. Full-screen sections slide up from below and **lock into the previous section like puzzle pieces**.
 
