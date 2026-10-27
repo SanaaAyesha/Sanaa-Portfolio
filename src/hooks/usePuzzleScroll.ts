@@ -491,7 +491,7 @@ export function usePuzzleScroll(stageRef: RefObject<HTMLElement | null>, { trans
          * section, the pieces rise and snap, and further input is ignored until it
          * lands. (Reduced-motion visitors never get this: they keep native scrolling.)
          */
-        const STEP_SECONDS = 3
+        const STEP_SECONDS = 2
         let stepping = false
         let unlockAt = 0
         let lastWheel = { t: 0, abs: 0 }

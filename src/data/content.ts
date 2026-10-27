@@ -58,12 +58,11 @@ export const projects = {
 export const contact = {
   eyebrow: 'Contact',
   lines: ["Let's build", 'something', 'extraordinary.'],
-  email: 'hello@example.com',
+  email: 'sanaa.ayesha.design@gmail.com',
   body: 'Tell us about your product, your timeline and what success looks like. We reply within two working days.',
   socials: [
     { label: 'Instagram', href: '#' },
     { label: 'LinkedIn', href: '#' },
-    { label: 'Dribbble', href: '#' },
-    { label: 'GitHub', href: '#' },
+    { label: 'Behance', href: '#' },
   ],
 }
