@@ -4,21 +4,25 @@
 /*  Palette + type. Change colours here; sections reference these tokens.     */
 /* -------------------------------------------------------------------------- */
 @theme {
-  --color-ink: #03050b; /* the "table" the pieces slide over */
-  --color-night: #050608;
-  --color-navy: #070b1a;
-  --color-navy-2: #0c1433;
-  --color-royal: #1537c9;
-  --color-royal-2: #0f2aa3;
-  --color-electric: #3d7bff;
-  --color-electric-2: #7fb0ff;
-  --color-ice: #eef1f6;
-  --color-ember: #ff6a2b;
+  /* Theme: Porcelain #F7F6F1 / Soft Linen #E8E5DD / Powder Blue #8FB1D1.
+     Text ink and the deeper blues are shades derived from Powder Blue. */
+  --color-ink: #1b2733; /* text + the "table" the pieces slide over */
+  --color-night: #1b2733;
+  --color-navy: #1b2733;
+  --color-navy-2: #2a3a4a;
+  --color-royal: #3f6b96;
+  --color-royal-2: #2f5578;
+  --color-electric: #8fb1d1; /* Powder Blue */
+  --color-electric-2: #8fb1d1;
+  --color-ice: #f7f6f1; /* Porcelain */
+  --color-linen: #e8e5dd; /* Soft Linen */
+  --color-ember: #d2693f;
   --color-mint: #3ef0b0;
 
-  --font-display: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
-  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+  --font-display: 'Fraunces', ui-serif, Georgia, serif;
+  --font-sans: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+  /* Labels and navigation use DM Sans too (the `font-mono` class is kept for them). */
+  --font-mono: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -26,7 +30,7 @@
 @layer base {
   html {
     background: var(--color-ink);
-    color: white;
+    color: var(--color-ink);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
@@ -37,11 +41,16 @@
     margin: 0;
     background: var(--color-ink);
     font-family: var(--font-sans);
+    font-weight: 400;
     overflow-x: hidden;
+  }
+  /* Navigation & labels: DM Sans 500. Headings: Fraunces 500–600. */
+  .font-mono {
+    font-weight: 500;
   }
   ::selection {
     background: var(--color-electric);
-    color: white;
+    color: var(--color-ink);
   }
   :focus-visible {
     outline: 2px solid var(--color-electric-2);
@@ -59,14 +68,10 @@
   /* The table: a mid slate with a dot grid, visible only in the gap between
      pieces. Lighter than the dark pieces, darker than the light ones, so the
      gap reads against every section. */
-  background-color: #1a2240;
-  background-image:
-    radial-gradient(rgb(127 176 255 / 0.28) 1px, transparent 1.4px),
-    radial-gradient(120% 60% at 50% 50%, #243058 0%, #1a2240 70%);
-  background-size:
-    22px 22px,
-    100% 100%;
-  overflow-x: clip;
+  background-color: #e8e5dd;
+  background-image: radial-gradient(rgb(27 39 51 / 0.18) 1px, transparent 1.4px);
+  background-size: 22px 22px;
+    overflow-x: clip;
   /* Native vertical swiping (and pinch-zoom) only; nothing is hijacked. */
   touch-action: pan-y pinch-zoom;
 }
@@ -163,7 +168,7 @@
 .ps-shadow-shape {
   position: absolute;
   inset: 0;
-  background: rgb(0 0 0 / 0.7);
+  background: rgb(27 39 51 / 0.45);
 }
 @media (max-width: 767px) {
   .ps-shadow {
@@ -196,11 +201,17 @@
 /* No filter: a wide faint stroke reads as glow at a fraction of the raster cost. */
 .ps-seam-glow {
   stroke-width: 9;
-  stroke-opacity: 0.22;
+  stroke-opacity: 0.5;
+}
+.ps-seam-sweep {
+  stroke: #fff;
+  stroke-width: 5;
+  stroke-dasharray: 0.16 1;
+  stroke-dashoffset: 0.16;
 }
 .ps-seam-core {
   stroke-width: 1.5;
-  stroke: white;
+  stroke: #f7f6f1;
 }
 
 /* Rim light: a crisp bevel along each joint edge. Half the stroke is clipped
@@ -215,11 +226,11 @@
   stroke-linejoin: round;
 }
 .ps-rim-line {
-  stroke: rgb(255 255 255 / 0.28);
+  stroke: rgb(255 255 255 / 0.55);
   stroke-width: 2;
 }
 .ps[data-theme='light'] .ps-rim-line {
-  stroke: rgb(7 11 26 / 0.18);
+  stroke: rgb(27 39 51 / 0.14);
 }
 
 /* Line-mask for text reveals. */

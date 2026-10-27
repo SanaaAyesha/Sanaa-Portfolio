@@ -29,7 +29,8 @@ export function useSmoothScroll() {
         duration: 1.1,
         // Expo-out: responds on the first frame, then glides to rest.
         easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-        smoothWheel: true,
+        // Wheel input is handled as whole-section steps by usePuzzleScroll.
+        smoothWheel: false,
         syncTouch: false,
         wheelMultiplier: 0.9,
         touchMultiplier: 1,

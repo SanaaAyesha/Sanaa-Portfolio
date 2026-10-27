@@ -21,8 +21,8 @@ export function ShapeGallery() {
   const width = vw - 32
 
   return (
-    <main className="min-h-screen bg-[#1a2240] px-4 py-6 font-mono text-xs text-white/70">
-      <h1 className="mb-4 text-sm text-white">
+    <main className="min-h-screen bg-[#d8d4ca] px-4 py-6 font-mono text-xs text-ink/70">
+      <h1 className="mb-4 text-sm text-ink">
         Puzzle shapes · {Math.round(vw)}px · {getBreakpoint(vw)}
       </h1>
       {PUZZLE_SHAPES.map((shape) => {
@@ -36,14 +36,14 @@ export function ShapeGallery() {
           const h = BODY + offset + BODY + upperPads.bottom
           return (
             <svg width={width} height={h} viewBox={`0 0 ${width} ${h}`} className="block">
-              <path d={upper} fill="#eef1f6" />
-              <path d={lower} fill="#1537c9" transform={`translate(0 ${BODY + offset - lowerPads.top})`} />
+              <path d={upper} fill="#f7f6f1" />
+              <path d={lower} fill="#8fb1d1" transform={`translate(0 ${BODY + offset - lowerPads.top})`} />
             </svg>
           )
         }
         return (
           <section key={shape} data-shape={shape} className="mb-8">
-            <p className="mb-2 text-white">
+            <p className="mb-2 text-ink">
               {shape} · gap {Math.round(joint.gap)}px · connectors{' '}
               {joint.connectors.map((c) => `${c.profile}/${c.dir} ${Math.round(c.width)}×${Math.round(c.depth)}`).join(', ')}
             </p>

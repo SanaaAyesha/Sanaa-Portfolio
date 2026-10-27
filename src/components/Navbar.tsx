@@ -50,11 +50,11 @@ export function Navbar({ items, active, theme, total, onNavigate }: NavbarProps)
   }
 
   const light = theme === 'light' && !open
-  const tone = light ? 'text-navy' : 'text-white'
+  const tone = light ? 'text-navy' : 'text-ink'
   // Solid-ish pills keep the nav legible over the connector sitting at the top of
   // each piece. No backdrop blur: it would re-blur moving content every frame.
   const pill = `rounded-full transition-colors duration-500 ${
-    light ? 'bg-white/85 ring-1 ring-navy/10' : 'bg-navy/75 ring-1 ring-white/10'
+    light ? 'bg-ice/85 ring-1 ring-ink/10' : 'bg-ice/55 ring-1 ring-ink/10'
   }`
 
   return (
@@ -69,7 +69,7 @@ export function Navbar({ items, active, theme, total, onNavigate }: NavbarProps)
         <a
           href={`#${items[0].id}`}
           onClick={go(0)}
-          className={`group relative z-10 -ml-3 flex items-center gap-2.5 py-2 pr-4 pl-3 font-display text-[15px] font-bold tracking-[0.18em] uppercase ${open ? '' : pill}`}
+          className={`group relative z-10 -ml-3 flex items-center gap-2.5 py-2 pr-4 pl-3 font-sans text-[15px] font-semibold tracking-[0.18em] uppercase ${open ? '' : pill}`}
           aria-label="Interlock, back to top"
         >
           <Logo className="h-6 w-6 transition-transform duration-500 ease-out-expo group-hover:-rotate-90" />
@@ -135,7 +135,7 @@ export function Navbar({ items, active, theme, total, onNavigate }: NavbarProps)
       <div
         id={menuId}
         hidden={!open}
-        className="fixed inset-0 -z-0 bg-navy/96 px-5 pt-28 backdrop-blur-xl lg:hidden"
+        className="fixed inset-0 -z-0 bg-electric/95 px-5 pt-28 backdrop-blur-xl lg:hidden"
       >
         <ul className="flex flex-col gap-2">
           {links.map((item, i) => (
@@ -144,9 +144,9 @@ export function Navbar({ items, active, theme, total, onNavigate }: NavbarProps)
                 href={`#${item.id}`}
                 onClick={go(i + 1)}
                 aria-current={i + 1 === active ? 'true' : undefined}
-                className="flex items-baseline gap-4 border-b border-white/10 py-4 font-display text-4xl font-semibold tracking-tight"
+                className="flex items-baseline gap-4 border-b border-ink/10 py-4 font-sans text-4xl font-medium tracking-tight"
               >
-                <span className="font-mono text-xs tracking-[0.2em] text-electric-2">0{i + 2}</span>
+                <span className="font-mono text-xs tracking-[0.2em] text-ink">0{i + 2}</span>
                 {item.label}
               </a>
             </li>

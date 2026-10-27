@@ -5,8 +5,8 @@
  */
 
 export const hero = {
-  lines: ['Building', 'Digital', 'Experiences'],
-  subtitle: 'We design and build immersive digital products, web experiences and interactive platforms.',
+  lines: ['Every great product starts', 'with connecting the', 'right pieces'],
+  subtitle: 'Product Designer with 4 years of experience transforming complex workflows into intuitive digital experiences. I connect user needs, business goals, and scalable design systems to create products that feel effortless to use.',
   cta: 'Explore Work',
   meta: ['Design & Technology Studio', 'Est. 2016 — Remote, worldwide'],
 }
@@ -48,10 +48,10 @@ export const projects = {
   eyebrow: 'Selected work',
   title: ['Recent', 'projects'],
   items: [
-    { title: 'Aurora OS', client: 'Northwind', tags: 'Product · Platform', year: '2026', art: ['#1537c9', '#3d7bff', '#050608'] },
-    { title: 'Tidal', client: 'Halcyon Audio', tags: 'Web · 3D', year: '2025', art: ['#0c1433', '#3ef0b0', '#050608'] },
-    { title: 'Meridian', client: 'Atlas Bank', tags: 'Product Design', year: '2025', art: ['#ff6a2b', '#1537c9', '#070b1a'] },
-    { title: 'Parallel', client: 'Studio Kiln', tags: 'Interactive', year: '2024', art: ['#7fb0ff', '#eef1f6', '#0c1433'] },
+    { title: 'Aurora OS', client: 'Northwind', tags: 'Product · Platform', year: '2026', art: ['#8fb1d1', '#e8e5dd', '#1b2733'] },
+    { title: 'Tidal', client: 'Halcyon Audio', tags: 'Web · 3D', year: '2025', art: ['#2a3a4a', '#8fb1d1', '#1b2733'] },
+    { title: 'Meridian', client: 'Atlas Bank', tags: 'Product Design', year: '2025', art: ['#d2693f', '#8fb1d1', '#1b2733'] },
+    { title: 'Parallel', client: 'Studio Kiln', tags: 'Interactive', year: '2024', art: ['#8fb1d1', '#f7f6f1', '#3f6b96'] },
   ] satisfies Project[],
 }
 

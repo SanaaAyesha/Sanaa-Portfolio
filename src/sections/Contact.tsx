@@ -5,26 +5,22 @@ import type { SectionProps } from './types'
 export function ContactBackdrop() {
   return (
     <>
-      <div className="absolute inset-0 bg-[linear-gradient(150deg,#3d7bff_0%,#1f55f0_45%,#1537c9_100%)]" />
-      <div data-depth="0.4" className="absolute inset-0">
-        <div className="drift absolute -top-[30%] -right-[20%] h-[80vmax] w-[80vmax] rounded-full bg-[radial-gradient(closest-side,rgba(255,255,255,0.22),transparent_70%)]" />
-      </div>
-      <div className="grain absolute inset-0" />
+      <div className="absolute inset-0 bg-ice" />
     </>
   )
 }
 
-export function Contact({ goTo }: SectionProps) {
+export function Contact(_: SectionProps) {
   return (
     <SectionContent align="between">
       <div />
       <div>
-        <Eyebrow index="05" className="text-white/80">
+        <Eyebrow index="05" className="text-ink/80">
           {contact.eyebrow}
         </Eyebrow>
         <RevealLines
           lines={contact.lines}
-          className="mt-[clamp(1rem,3vh,2rem)] font-display text-[clamp(1.85rem,min(9.2vw,13.5vh),10.5rem)] leading-[0.88] font-extrabold tracking-[-0.045em] uppercase"
+          className="mt-[clamp(1rem,3vh,2rem)] font-display text-[clamp(1.85rem,min(9.2vw,13.5vh),10.5rem)] leading-[0.88] font-semibold tracking-[-0.02em] uppercase"
         />
 
         <div className="mt-[clamp(1.5rem,5vh,3.5rem)] grid items-end gap-6 md:grid-cols-12">
@@ -37,10 +33,10 @@ export function Contact({ goTo }: SectionProps) {
             {contact.email}
             <span
               aria-hidden="true"
-              className="absolute inset-x-0 -bottom-1 h-px origin-right scale-x-0 bg-white transition-transform duration-700 ease-out-expo group-hover:origin-left group-hover:scale-x-100"
+              className="absolute inset-x-0 -bottom-1 h-px origin-right scale-x-0 bg-ink transition-transform duration-700 ease-out-expo group-hover:origin-left group-hover:scale-x-100"
             />
           </a>
-          <p data-reveal="fade" className="max-w-sm text-sm leading-relaxed text-white/75 md:col-span-5 md:justify-self-end">
+          <p data-reveal="fade" className="max-w-sm text-sm leading-relaxed text-ink/75 md:col-span-5 md:justify-self-end">
             {contact.body}
           </p>
         </div>
@@ -48,7 +44,7 @@ export function Contact({ goTo }: SectionProps) {
 
       <footer
         data-reveal="fade"
-        className="mt-8 flex flex-col gap-4 border-t border-white/25 pt-5 font-mono text-[11px] tracking-[0.18em] uppercase sm:flex-row sm:items-center sm:justify-between"
+        className="mt-8 flex flex-col gap-4 border-t border-ink/25 pt-5 font-mono text-[11px] tracking-[0.18em] uppercase sm:flex-row sm:items-center sm:justify-between"
       >
         <ul className="flex flex-wrap gap-x-6 gap-y-2">
           {contact.socials.map((s) => (
@@ -61,9 +57,6 @@ export function Contact({ goTo }: SectionProps) {
         </ul>
         <div className="flex items-center justify-between gap-6 opacity-80 sm:justify-end">
           <span>© {new Date().getFullYear()} Interlock Studio</span>
-          <button type="button" onClick={() => goTo('hero')} className="whitespace-nowrap transition-opacity hover:opacity-100">
-            Back to top ↑
-          </button>
         </div>
       </footer>
     </SectionContent>

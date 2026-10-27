@@ -25,7 +25,7 @@ export const MOTION = {
    * needs to soften residual steps (touch, keyboard). Higher values stack a
    * second delay on top of Lenis and the pieces start to lag the scroll.
    */
-  scrub: 0.35,
+  scrub: 0.5,
   /** How far the camera pans up to expose the current piece's lower edge (fraction of viewport). */
   lift: 0.5,
   /**
@@ -60,6 +60,8 @@ const STOPPED_VELOCITY = 0.3
 const clamp = (min: number, value: number, max: number) => Math.min(max, Math.max(min, value))
 const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3)
 const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2)
+/** Unhurried start, one long glide, a soft landing: the pieces ease into their magnet. */
+const easeStep = (t: number) => (t < 0.5 ? 8 * t * t * t * t : 1 - Math.pow(-2 * t + 2, 4) / 2)
 
 /**
  * Pins the stage and maps scroll position onto puzzle transitions. One pinned
@@ -299,7 +301,14 @@ export function usePuzzleScroll(stageRef: RefObject<HTMLElement | null>, { trans
         const states: SnapState[] = sections.map((_, k) => (k === 0 ? 'SNAPPED' : 'IDLE'))
         const snapTweens: (gsap.core.Timeline | null)[] = sections.map(() => null)
 
+        /**
+         * Once the visitor has reached the bottom, the sections stay joined for good:
+         * scrolling back up carries the whole locked stack instead of un-making each joint.
+         */
+        let connected = false
+
         const stateAt = (k: number, time: number): SnapState => {
+          if (connected) return 'SNAPPED'
           const T = transitions[k - 1].timing
           const t = time - (k - 1)
           if (t >= T.align) return 'SNAPPED'
@@ -327,16 +336,24 @@ export function usePuzzleScroll(stageRef: RefObject<HTMLElement | null>, { trans
             return
           }
           const { duration: d, overshoot } = transitions[k - 1].snap
-          const pull = d * 0.45
+          const pull = Math.min(0.24, d * 0.3)
+          const rebound = d * 0.28
+          const settle = d * 0.42
+          const sweep = flashes[k]?.querySelector<SVGPathElement>('.ps-seam-sweep') ?? null
+          const glow = flashes[k]?.querySelector<SVGPathElement>('.ps-seam-glow') ?? null
           snapTweens[k] = gsap
             .timeline()
-            // The magnet is strongest at the end, so the pull accelerates.
-            .to(float, { y: -near - overshoot, duration: pull, ease: 'power2.in' })
-            // Contact: it eases back the ~1px into the exact position.
-            .to(float, { y: -near, duration: d - pull, ease: 'power3.out' })
+            // The magnet is strongest at the end: the pull accelerates into contact...
+            .to(float, { y: -near - overshoot, scale: 0.996, transformOrigin: '50% 0%', duration: pull, ease: 'power3.in' })
+            // ...the pieces press together, rebound a hair, and settle into the exact joint.
+            .to(float, { y: -near + overshoot * 0.3, scale: 1.0025, duration: rebound, ease: 'power2.out' })
+            .to(float, { y: -near, scale: 1, duration: settle, ease: 'power2.inOut' })
             .to(shadowShapes[k], { opacity: 0, duration: pull, ease: 'power2.in' }, 0)
-            .fromTo(flashes[k], { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.05 }, pull)
-            .to(flashes[k], { autoAlpha: 0, duration: 0.6, ease: 'power2.out' }, pull + 0.05)
+            // Impact light: the joint flares, a bright spark runs along it, and the glow decays.
+            .fromTo(flashes[k], { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.06 }, pull)
+            .fromTo(glow, { attr: { 'stroke-width': 8 } }, { attr: { 'stroke-width': 30 }, duration: 0.8, ease: 'power2.out' }, pull)
+            .fromTo(sweep, { strokeDashoffset: 0.16 }, { strokeDashoffset: -1, duration: 0.95, ease: 'power2.inOut' }, pull)
+            .to(flashes[k], { autoAlpha: 0, duration: 0.9, ease: 'power2.out' }, pull + 0.35)
         }
 
         /** Scrolling back past the snap point: the pieces separate. */
@@ -345,14 +362,14 @@ export function usePuzzleScroll(stageRef: RefObject<HTMLElement | null>, { trans
           if (!float) return
           stopSnap(k)
           if (instant) {
-            gsap.set(float, { y: 0 })
+            gsap.set(float, { y: 0, scale: 1 })
             gsap.set(shadowShapes[k], { opacity: 1 })
             gsap.set(flashes[k], { autoAlpha: 0 })
             return
           }
           snapTweens[k] = gsap
             .timeline()
-            .to(float, { y: 0, duration: 0.3, ease: 'power2.out' })
+            .to(float, { y: 0, scale: 1, duration: 0.3, ease: 'power2.out' })
             .to(shadowShapes[k], { opacity: 1, duration: 0.25, ease: 'power1.out' }, 0.05)
             .set(flashes[k], { autoAlpha: 0 }, 0)
         }
@@ -371,7 +388,27 @@ export function usePuzzleScroll(stageRef: RefObject<HTMLElement | null>, { trans
         }
         // Driven by the animation's own time (not raw scroll), so the magnet engages
         // exactly when the piece has visually reached alignment.
-        tl.eventCallback('onUpdate', () => sync(false))
+        const enterConnected = () => {
+          if (connected || tl.progress() < 0.999) return
+          connected = true
+          // Replace the separate-then-join choreography with one rigid stack: every
+          // piece sits exactly where it ended up, and just moves with the scroll.
+          tl.clear()
+          for (let k = 0; k < n; k++) {
+            tl.addLabel(`s${k}`, k) // clear() drops labels; scrollToIndex / step scrolling need them
+            tl.fromTo(sections[k], { yPercent: k * 100 }, { yPercent: (k - (n - 1)) * 100, duration: n - 1, ease: 'none' }, 0)
+          }
+          tl.progress(1, true)
+          for (let k = 1; k < n; k++) {
+            states[k] = 'SNAPPED'
+            sections[k].dataset.puzzleState = 'SNAPPED'
+          }
+        }
+        tl.eventCallback('onUpdate', () => {
+          sync(false)
+          // Outside the render pass: rebuilding a timeline from its own callback is asking for trouble.
+          if (!connected && tl.progress() >= 0.999) requestAnimationFrame(enterConnected)
+        })
 
         // After a resize the lock distance changes: re-seat locked pieces without animating.
         const onRefresh = () => {
@@ -449,6 +486,81 @@ export function usePuzzleScroll(stageRef: RefObject<HTMLElement | null>, { trans
           }, 180)
         })
 
+        /*
+         * Step scrolling: one wheel notch / swipe / key press carries the page a whole
+         * section, the pieces rise and snap, and further input is ignored until it
+         * lands. (Reduced-motion visitors never get this: they keep native scrolling.)
+         */
+        const STEP_SECONDS = 3
+        let stepping = false
+        let unlockAt = 0
+        let lastWheel = { t: 0, abs: 0 }
+        const stepTo = (dir: 1 | -1) => {
+          const lenis = lenisRef.current
+          if (!lenis || stepping || lenis.isScrolling === 'smooth' || n < 2) return
+          const pos = trigger.progress * (n - 1)
+          const target = Math.min(n - 1, Math.max(0, dir > 0 ? Math.floor(pos + 0.02) + 1 : Math.ceil(pos - 0.02) - 1))
+          if (target === Math.round(pos) && Math.abs(pos - target) < 0.02) return
+          stepping = true
+          lenis.scrollTo(trigger.labelToScroll(`s${target}`), {
+            duration: STEP_SECONDS,
+            easing: easeStep,
+            onComplete: () => {
+              stepping = false
+              // Trackpad inertia keeps firing wheel events for a moment after the gesture.
+              unlockAt = performance.now() + 400
+              commitActive(target)
+            },
+          })
+        }
+        const onWheel = (e: WheelEvent) => {
+          if (e.ctrlKey) return // pinch-zoom
+          e.preventDefault()
+          // Lenis treats any wheel event as a native scroll and would cancel the step in flight.
+          e.stopPropagation()
+          const now = performance.now()
+          const abs = Math.abs(e.deltaY)
+          const quiet = now - lastWheel.t > 100
+          const surge = abs > lastWheel.abs * 1.6
+          lastWheel = { t: now, abs }
+          if (abs < 4 || stepping || now < unlockAt) return
+          // A new gesture: after a pause, or a clear surge — not the decaying tail of the last one.
+          if (!quiet && !surge) return
+          stepTo(e.deltaY > 0 ? 1 : -1)
+        }
+        const onKey = (e: KeyboardEvent) => {
+          if (e.altKey || e.ctrlKey || e.metaKey) return
+          const t = e.target as HTMLElement | null
+          if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return
+          const down = e.key === 'PageDown' || e.key === 'ArrowDown' || (e.key === ' ' && !e.shiftKey)
+          const up = e.key === 'PageUp' || e.key === 'ArrowUp' || (e.key === ' ' && e.shiftKey)
+          if (!down && !up) return
+          // A focused button/link keeps Space/Enter for itself.
+          if (e.key === ' ' && t && /^(BUTTON|A)$/.test(t.tagName)) return
+          e.preventDefault()
+          if (now() >= unlockAt) stepTo(down ? 1 : -1)
+        }
+        const now = () => performance.now()
+        let swipe: { y: number } | null = null
+        const onTouchStartStep = (e: TouchEvent) => {
+          swipe = e.touches.length === 1 ? { y: e.touches[0].clientY } : null
+        }
+        const onTouchMoveStep = (e: TouchEvent) => {
+          // Own the vertical gesture (leave multi-finger pinch alone).
+          if (swipe && e.touches.length === 1 && e.cancelable) e.preventDefault()
+        }
+        const onTouchEndStep = (e: TouchEvent) => {
+          if (!swipe || e.changedTouches.length !== 1) return
+          const dy = swipe.y - e.changedTouches[0].clientY
+          swipe = null
+          if (Math.abs(dy) > 40) stepTo(dy > 0 ? 1 : -1)
+        }
+        window.addEventListener('wheel', onWheel, { passive: false, capture: true })
+        window.addEventListener('keydown', onKey)
+        window.addEventListener('touchstart', onTouchStartStep, { passive: true })
+        window.addEventListener('touchmove', onTouchMoveStep, { passive: false })
+        window.addEventListener('touchend', onTouchEndStep, { passive: true })
+
         if (import.meta.env.DEV) {
           ;(window as unknown as { __puzzle?: unknown }).__puzzle = { tl, trigger, states, lenis: () => lenisRef.current }
         }
@@ -489,6 +601,11 @@ export function usePuzzleScroll(stageRef: RefObject<HTMLElement | null>, { trans
           window.removeEventListener('touchstart', onTouchStart)
           window.removeEventListener('touchend', onTouchEnd)
           window.removeEventListener('touchcancel', onTouchEnd)
+          window.removeEventListener('wheel', onWheel, { capture: true })
+          window.removeEventListener('keydown', onKey)
+          window.removeEventListener('touchstart', onTouchStartStep)
+          window.removeEventListener('touchmove', onTouchMoveStep)
+          window.removeEventListener('touchend', onTouchEndStep)
           sections.forEach((_, k) => stopSnap(k))
           // Snap tweens run outside this context, so matchMedia can't revert them.
           gsap.set([...floats, ...shadowShapes, ...flashes].filter(Boolean), { clearProps: 'transform,opacity,visibility' })

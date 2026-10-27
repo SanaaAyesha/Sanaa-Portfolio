@@ -27,6 +27,8 @@ export function PuzzleEdge({ geometry, color = 'var(--color-electric)' }: Puzzle
       <g data-seam-flash style={{ color }}>
         <path d={seam ?? ''} className="ps-seam-glow" />
         <path d={seam ?? ''} className="ps-seam-core" />
+        {/* A short bright spark that runs the length of the joint (pathLength=1 → dash offsets are fractions). */}
+        <path d={seam ?? ''} className="ps-seam-sweep" pathLength={1} />
       </g>
     </svg>
   )

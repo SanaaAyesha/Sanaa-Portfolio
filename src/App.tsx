@@ -28,42 +28,42 @@ interface SectionDef {
  * edges and scroll transitions are generated from this list.
  */
 const SECTIONS: SectionDef[] = [
-  { id: 'hero', label: 'Home', theme: 'dark', background: '#070b1a', Backdrop: HeroBackdrop, Component: Hero },
+  { id: 'hero', label: 'Home', theme: 'light', background: '#f7f6f1', Backdrop: HeroBackdrop, Component: Hero },
   {
     id: 'about',
     label: 'About',
     theme: 'dark',
-    background: '#1537c9',
+    background: '#8fb1d1',
     Backdrop: AboutBackdrop,
     Component: About,
-    seamColor: '#7fb0ff',
+    seamColor: '#f7f6f1',
   },
   {
     id: 'services',
     label: 'Services',
     theme: 'light',
-    background: '#eef1f6',
+    background: '#f7f6f1',
     Backdrop: ServicesBackdrop,
     Component: Services,
-    seamColor: '#3d7bff',
+    seamColor: '#8fb1d1',
   },
   {
     id: 'projects',
     label: 'Projects',
     theme: 'dark',
-    background: '#050608',
+    background: '#8fb1d1',
     Backdrop: ProjectsBackdrop,
     Component: Projects,
-    seamColor: '#3d7bff',
+    seamColor: '#8fb1d1',
   },
   {
     id: 'contact',
     label: 'Contact',
-    theme: 'dark',
-    background: '#2a63ff',
+    theme: 'light',
+    background: '#f7f6f1',
     Backdrop: ContactBackdrop,
     Component: Contact,
-    seamColor: '#ff6a2b',
+    seamColor: '#e8e5dd',
   },
 ]
 
@@ -118,7 +118,7 @@ export default function App() {
     <>
       <a
         href="#main"
-        className="fixed top-3 left-3 z-[200] -translate-y-20 rounded-full bg-white px-4 py-2 text-sm font-medium text-navy focus:translate-y-0"
+        className="fixed top-3 left-3 z-[200] -translate-y-20 rounded-full bg-ice px-4 py-2 text-sm font-medium text-ink focus:translate-y-0"
       >
         Skip to content
       </a>
