@@ -8,7 +8,6 @@ export const hero = {
   lines: ['Every great product starts', 'with connecting the', 'right pieces'],
   subtitle: 'Product Designer with 4 years of experience transforming complex workflows into intuitive digital experiences. I connect user needs, business goals, and scalable design systems to create products that feel effortless to use.',
   cta: 'Explore Work',
-  meta: ['Design & Technology Studio', 'Est. 2016 — Remote, worldwide'],
 }
 
 export const about = {

@@ -71,8 +71,8 @@ export function Navbar({ items, active, theme, total, onNavigate }: NavbarProps)
           className={`group relative z-10 -ml-3 flex items-center gap-2.5 py-2 pr-4 pl-3 font-sans text-[16px] font-semibold tracking-[0.01em] ${open ? '' : pill}`}
           aria-label="Sanaa Ayesha, back to top"
         >
-          <span>Sanaa Ayesha</span>
           <Logo className="h-7 w-7 transition-transform duration-500 ease-out-expo group-hover:rotate-12" />
+          <span>Sanaa Ayesha</span>
         </a>
 
         <ul className={`hidden items-center gap-0.5 p-1 lg:flex ${pill}`}>

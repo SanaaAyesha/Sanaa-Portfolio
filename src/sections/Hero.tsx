@@ -16,15 +16,6 @@ export function HeroBackdrop() {
 export function Hero({ goTo }: SectionProps) {
   return (
     <SectionContent align="end">
-      <div
-        data-reveal="fade"
-        className="absolute inset-x-5 top-[clamp(6rem,13vh,8.5rem)] hidden justify-between font-mono text-[11px] tracking-[0.22em] text-ink/50 uppercase sm:inset-x-8 sm:flex lg:inset-x-12"
-      >
-        {hero.meta.map((m) => (
-          <span key={m}>{m}</span>
-        ))}
-      </div>
-
       {/* Where the scattered jigsaw pieces assemble into the portrait (see PuzzlePortrait). */}
       <div
         data-reveal="fade"
