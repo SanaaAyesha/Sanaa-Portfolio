@@ -14,15 +14,14 @@ interface NavbarProps {
   onNavigate: (index: number) => void
 }
 
+/** A single jigsaw piece: knob on top and right, matching notch on the left. */
 export function Logo({ className = '' }: { className?: string }) {
   return (
     <svg viewBox="0 0 28 28" className={className} aria-hidden="true" focusable="false">
       <path
-        d="M2 2h9.2c0 2.9 1.6 4.3 2.8 4.3s2.8-1.4 2.8-4.3H26v24H2z"
-        fill="currentColor"
-        opacity="0.28"
+        d="M4 9H9.8a3.6 3.6 0 1 1 6.4 0H24V14.8a3.6 3.6 0 1 1 0 6.4V27H4V21.2a3.6 3.6 0 1 0 0-6.4Z"
+        fill="var(--color-electric)"
       />
-      <path d="M2 14h9.2c0 2.9 1.6 4.3 2.8 4.3s2.8-1.4 2.8-4.3H26v12H2z" fill="currentColor" />
     </svg>
   )
 }
@@ -72,8 +71,8 @@ export function Navbar({ items, active, theme, total, onNavigate }: NavbarProps)
           className={`group relative z-10 -ml-3 flex items-center gap-2.5 py-2 pr-4 pl-3 font-sans text-[16px] font-semibold tracking-[0.01em] ${open ? '' : pill}`}
           aria-label="Sanaa Ayesha, back to top"
         >
-          <Logo className="h-6 w-6 transition-transform duration-500 ease-out-expo group-hover:-rotate-90" />
           <span>Sanaa Ayesha</span>
+          <Logo className="h-7 w-7 transition-transform duration-500 ease-out-expo group-hover:rotate-12" />
         </a>
 
         <ul className={`hidden items-center gap-0.5 p-1 lg:flex ${pill}`}>
